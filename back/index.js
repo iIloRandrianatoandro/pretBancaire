@@ -32,7 +32,7 @@ app.get("/liste",(req,res) => {
 
 //total somme
 app.get("/somme",(req,res) => {
-    con.query("select sum(montant*(1+taux_pret)) as totalSomme from Pret_bancaire",(error,data,fields)=>{
+    con.query("select sum(montant*(1+taux_pret)) as totalSomme, min(montant*(1+taux_pret)) as min, max(montant*(1+taux_pret)) as max from Pret_bancaire",(error,data,fields)=>{
         if(error)return res.json(error);
         return res.json(data);
         }
