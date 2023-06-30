@@ -23,27 +23,28 @@ const con = mysql.createConnection({
 
 //liste de tous les prets
 app.get("/liste",(req,res) => {
-    con.query("select * from Pret_bancaire",(error,data,fields)=>{
+    con.query("select num_compte,nom_client,nom_banque,montant,date_pret,taux_pret, (montant*(1+taux_pret)) as montantAPayer from Pret_bancaire",(error,data,fields)=>{
         if(error)return res.json(error);
         return res.json(data);
         }
     )
 })
 
+//total somme
+app.get("/somme",(req,res) => {
+    con.query("select sum(montant*(1+taux_pret)) as totalSomme from Pret_bancaire",(error,data,fields)=>{
+        if(error)return res.json(error);
+        return res.json(data);
+        }
+    )
+})
 //ajout nouveau pret
 app.post("/ajout", upload.single(),(req,res)=>{
-    //return(req);
     con.query("insert into Pret_bancaire(num_compte,nom_client,nom_banque,montant,date_pret,taux_pret)values(?,?,?,?,?,?)"
     , [req.body.num_compte,req.body.nom_client,req.body.nom_banque,req.body.montant,req.body.date_pret,req.body.taux_pret],(error,data,fields)=>{
         if(error)return res.send(error);
         return res.send(data);
     })
-    //return res.json(req.num_compte);
-    /*con.query("insert into Pret_bancaire(num_compte,nom_client,nom_banque,montant,date_pret,taux_pret)values(?,?,?,?,?,?)"
-    , ["P004","Bao","BFV",20000,"10/10/10",7],(error,data,fields)=>{
-        if(error)return res.json(error);
-        return res.json(data);
-    })*/ return;
 })
 
 //supprimer un pret
@@ -58,6 +59,14 @@ app.delete("/supprimer/:num_compte",(req,res) => {
 app.put("/modifier/:num_compte", upload.single(),(req,res) => {
     con.query('update Pret_bancaire set nom_client=?, nom_banque=?, montant=?, date_pret=?, taux_pret=? where num_compte=?',
     [req.body.nom_client,req.body.nom_banque,req.body.montant,req.body.date_pret,req.body.taux_pret,req.params.num_compte],(error,data,fields)=>{
+        if(error)return res.json(error);
+        return res.json(data);
+        }
+    )
+})
+//get element d'1 pret
+app.get("/pret/:num_compte",(req,res) => {
+    con.query("select * from Pret_bancaire where num_compte=?",req.params.num_compte,(error,data,fields)=>{
         if(error)return res.json(error);
         return res.json(data);
         }
